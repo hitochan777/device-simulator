@@ -33,8 +33,18 @@ namespace DeviceSimulator
 			{
 				throw new DeviceNotFoundException(deviceId);
 			}
-			await device.StartAsync(this.cancellationTokenSource.Token);
+			_ = device.StartAsync(this.cancellationTokenSource.Token);
 			devices[deviceId] = device;
+		}
+
+		public async Task StopDeviceAsync(string deviceId)
+		{
+			if (!devices.ContainsKey(deviceId))
+			{
+				throw new InvalidOperationException($"{deviceId} is not started yet");
+			}
+			await devices[deviceId].StopAsync();
+			this.devices.Remove(deviceId, out _);
 		}
 
 		public async Task CreateDeviceAsync(string deviceId)
@@ -68,9 +78,12 @@ namespace DeviceSimulator
 			return ids;
 		}
 
-		public void Dispose()
+		public async ValueTask DisposeAsync()
 		{
 			this.cancellationTokenSource.Cancel();
+			await Task.WhenAll(this.devices.Values.Select(device => device.StopAsync()));
+			this.devices = default;
+			Console.WriteLine("disposed device manager...");
 		}
 	}
 }

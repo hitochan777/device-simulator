@@ -6,6 +6,8 @@ namespace DeviceSimulator
 	public interface IDevice
 	{
 		Task StartAsync(CancellationToken token);
+
+		Task StopAsync();
 		Task SendMessageAsync(string message);
 	}
 }

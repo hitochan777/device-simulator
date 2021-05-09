@@ -9,7 +9,7 @@ namespace DeviceSimulator
 		{
 			var deviceFactory = new IotHubDeviceFactory(CONNECTION_STRING);
 			var deviceRegistrar = new IotHubDeviceRegistrar(CONNECTION_STRING);
-			using var deviceManager = new OnmemoryDeviceManager(deviceFactory, deviceRegistrar);
+			await using var deviceManager = new OnmemoryDeviceManager(deviceFactory, deviceRegistrar);
 			while (true)
 			{
 				Console.Write("> ");
@@ -35,6 +35,23 @@ namespace DeviceSimulator
 							{
 								Console.WriteLine("Failed to start device: " + ex.Message);
 							}
+							catch (InvalidOperationException ex)
+							{
+								Console.WriteLine(ex.Message);
+							}
+							break;
+						}
+					case "stop":
+						{
+							var deviceId = tokens[1];
+							try
+							{
+								await deviceManager.StopDeviceAsync(deviceId);
+							}
+							catch (InvalidOperationException ex)
+							{
+								Console.WriteLine(ex.Message);
+							}
 							break;
 						}
 					case "send":
@@ -53,7 +70,7 @@ namespace DeviceSimulator
 						}
 					case "list":
 						{
-							var ids = await deviceManager.ListDevices(onlyRunning: false);
+							var ids = await deviceManager.ListDevices(onlyRunning: true);
 							foreach (var id in ids)
 							{
 								Console.WriteLine(id);

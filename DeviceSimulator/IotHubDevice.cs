@@ -1,6 +1,7 @@
 namespace DeviceSimulator
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Threading;
 	using System.Threading.Tasks;
 	using System.Text;
@@ -10,6 +11,8 @@ namespace DeviceSimulator
 	{
 		private string deviceId { get; set; }
 		private DeviceClient deviceClient { get; set; }
+		private Task receiverTask { get; set; }
+		private CancellationTokenSource cancellationTokenSource { get; set; }
 
 		public IotHubDevice(string deviceId, DeviceClient deviceClient)
 		{
@@ -18,8 +21,13 @@ namespace DeviceSimulator
 
 		public Task StartAsync(CancellationToken token)
 		{
-			_ = StartReceiverAsync(token);
-			return Task.CompletedTask;
+			if (receiverTask != null)
+			{
+				throw new InvalidOperationException("device is running");
+			}
+			this.cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
+			this.receiverTask = StartReceiverAsync(this.cancellationTokenSource.Token);
+			return this.receiverTask;
 		}
 
 		public async Task SendMessageAsync(string message)
@@ -28,16 +36,39 @@ namespace DeviceSimulator
 			Console.WriteLine($"Sent message {message}");
 		}
 
+		public async Task StopAsync()
+		{
+			if (this.cancellationTokenSource != null)
+			{
+				this.cancellationTokenSource.Cancel();
+			}
+			if (this.receiverTask != null)
+			{
+				await this.receiverTask;
+			}
+			this.receiverTask = null;
+			this.deviceClient.Dispose();
+		}
+
 		private async Task StartReceiverAsync(CancellationToken token)
 		{
+			Console.WriteLine("waiting for message...");
 			while (!token.IsCancellationRequested)
 			{
-				Console.WriteLine("waiting for message...");
-				var message = await this.deviceClient.ReceiveAsync(token);
-				await this.deviceClient.CompleteAsync(message.LockToken);
-				Console.WriteLine("Received message ");
+				// https://github.com/Azure/azure-iot-sdk-csharp/issues/1921
+				// var message = await this.deviceClient.ReceiveAsync(token);
+				var message = await this.deviceClient.ReceiveAsync(TimeSpan.FromMilliseconds(1000));
+				if (message == null)
+				{
+					continue;
+				}
+				// await this.deviceClient.CompleteAsync(message, token);
+				await this.deviceClient.CompleteAsync(message);
+				var text = Encoding.UTF8.GetString(message.GetBytes());
+				Console.WriteLine($"\nReceived message: {text}");
 			}
 			Console.WriteLine("stopping receiver");
 		}
+
 	}
 }
