@@ -4,7 +4,7 @@ namespace DeviceSimulator
 	using System.Threading.Tasks;
 	class Program
 	{
-		private static readonly string CONNECTION_STRING = "HostName=attendance-taker-iothub.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=P0gtFyJAAeU0j+/j69hMoHBrlgksYlYq7I9BjJE8cpI=";
+		private static readonly string CONNECTION_STRING = Environment.GetEnvironmentVariable("IOTHUB_CONNECTION_STRING");
 		static async Task Main(string[] args)
 		{
 			var deviceFactory = new IotHubDeviceFactory(CONNECTION_STRING);
