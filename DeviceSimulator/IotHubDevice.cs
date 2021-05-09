@@ -16,6 +16,7 @@ namespace DeviceSimulator
 
 		public IotHubDevice(string deviceId, DeviceClient deviceClient)
 		{
+			this.deviceId = deviceId;
 			this.deviceClient = deviceClient;
 		}
 
@@ -52,7 +53,7 @@ namespace DeviceSimulator
 
 		private async Task StartReceiverAsync(CancellationToken token)
 		{
-			Console.WriteLine("waiting for message...");
+			Console.WriteLine($"[{this.deviceId}] waiting for message...");
 			while (!token.IsCancellationRequested)
 			{
 				// https://github.com/Azure/azure-iot-sdk-csharp/issues/1921
@@ -65,9 +66,9 @@ namespace DeviceSimulator
 				// await this.deviceClient.CompleteAsync(message, token);
 				await this.deviceClient.CompleteAsync(message);
 				var text = Encoding.UTF8.GetString(message.GetBytes());
-				Console.WriteLine($"\nReceived message: {text}");
+				Console.WriteLine($"\n[{this.deviceId}] Received message: {text}");
 			}
-			Console.WriteLine("stopping receiver");
+			Console.WriteLine($"[{this.deviceId}] stopping receiver");
 		}
 
 	}
