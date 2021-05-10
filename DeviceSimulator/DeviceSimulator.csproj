@@ -1,6 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+		<PackageId>DeviceSimulator</PackageId>
+		<Version>0.1.0</Version>
+		<Authors>Hitoshi Otsuki</Authors>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
