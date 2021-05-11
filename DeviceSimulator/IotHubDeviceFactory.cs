@@ -30,7 +30,7 @@ namespace DeviceSimulator
 			return string.Format(CONNECTION_STRING_TEMPLATE, this.hostName, deviceId, key);
 		}
 
-		public async Task<IDevice> CreateDevice(string deviceId)
+		public async Task<IDevice> CreateDevice(string deviceId, ITopicEventPublisher eventPublisher)
 		{
 			var device = await this.registryManager.GetDeviceAsync(deviceId);
 			if (device == null)
@@ -44,7 +44,7 @@ namespace DeviceSimulator
 			var key = device.Authentication.SymmetricKey.PrimaryKey;
 			var connectionString = this.BuildConnectionString(deviceId, key);
 			var deviceClient = DeviceClient.CreateFromConnectionString(connectionString);
-			return new IotHubDevice(deviceId, deviceClient);
+			return new IotHubDevice(deviceId, deviceClient, eventPublisher);
 		}
 	}
 }

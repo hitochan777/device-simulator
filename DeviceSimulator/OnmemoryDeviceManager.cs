@@ -6,6 +6,13 @@ namespace DeviceSimulator
 	using System.Threading;
 	using System.Threading.Tasks;
 	using System.Collections.Concurrent;
+	using PubSub;
+
+	public class TopicValue<T>
+	{
+		public string Topic { get; set; }
+		public T Value { get; set; }
+	}
 
 	public class OnmemoryDeviceManager : IDeviceManager
 	{
@@ -13,13 +20,18 @@ namespace DeviceSimulator
 		private CancellationTokenSource cancellationTokenSource { get; set; }
 		private IDeviceFactory deviceFactory { get; set; }
 		private IDeviceRegistrar deviceRegistrar { get; set; }
+		private ITopicEventPublisher eventPublisher { get; set; }
 
-		public OnmemoryDeviceManager(IDeviceFactory deviceFactory, IDeviceRegistrar deviceRegistrar)
+		private ITopicEventSubscriber eventSubscriber { get; set; }
+
+		public OnmemoryDeviceManager(IDeviceFactory deviceFactory, IDeviceRegistrar deviceRegistrar, ITopicEventPublisher eventPublisher, ITopicEventSubscriber eventSubscriber)
 		{
 			this.devices = new ConcurrentDictionary<string, IDevice>();
 			this.cancellationTokenSource = new CancellationTokenSource();
 			this.deviceFactory = deviceFactory;
 			this.deviceRegistrar = deviceRegistrar;
+			this.eventPublisher = eventPublisher;
+			this.eventSubscriber = eventSubscriber;
 		}
 
 		public async Task StartDeviceAsync(string deviceId)
@@ -28,7 +40,7 @@ namespace DeviceSimulator
 			{
 				throw new InvalidOperationException($"{deviceId} is already runnning");
 			}
-			var device = await this.deviceFactory.CreateDevice(deviceId);
+			var device = await this.deviceFactory.CreateDevice(deviceId, eventPublisher);
 			if (device == null)
 			{
 				throw new DeviceNotFoundException(deviceId);
@@ -76,6 +88,11 @@ namespace DeviceSimulator
 				ids.Add(deviceId);
 			}
 			return ids;
+		}
+
+		public IAsyncEnumerable<T> Subscribe<T>(string topic)
+		{
+			return this.eventSubscriber.SubscribeAsync<T>(topic, this.cancellationTokenSource.Token);
 		}
 
 		public async ValueTask DisposeAsync()
