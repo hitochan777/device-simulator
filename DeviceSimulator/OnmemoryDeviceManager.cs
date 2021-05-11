@@ -90,7 +90,7 @@ namespace DeviceSimulator
 			return ids;
 		}
 
-		public IAsyncEnumerable<T> Subscribe<T>(string topic)
+		public IAsyncEnumerable<TopicMessage<T>> Subscribe<T>(string topic)
 		{
 			return this.eventSubscriber.SubscribeAsync<T>(topic, this.cancellationTokenSource.Token);
 		}

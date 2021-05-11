@@ -6,6 +6,6 @@ namespace DeviceSimulator
 	using System.Threading.Tasks;
 	public interface ITopicEventSubscriber : IDisposable
 	{
-		IAsyncEnumerable<T> SubscribeAsync<T>(string topic, CancellationToken cancelToken);
+		IAsyncEnumerable<TopicMessage<T>> SubscribeAsync<T>(string topic, CancellationToken cancelToken);
 	}
 }

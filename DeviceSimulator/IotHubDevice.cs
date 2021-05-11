@@ -67,10 +67,10 @@ namespace DeviceSimulator
 				}
 				// await this.deviceClient.CompleteAsync(message, token);
 				await this.deviceClient.CompleteAsync(message);
-				var text = Encoding.UTF8.GetString(message.GetBytes());
+				var bytes = message.GetBytes();
+				var text = Encoding.UTF8.GetString(bytes);
 				Console.WriteLine($"\n[{this.deviceId}] Received message: {text}");
-				await this.eventPublisher.PublishAsync($"{deviceId}/receive-c2d", message.GetBytes());
-				Console.WriteLine("hoge");
+				await this.eventPublisher.PublishAsync($"{deviceId}/receive-c2d", bytes);
 			}
 			Console.WriteLine($"[{this.deviceId}] stopping receiver");
 		}

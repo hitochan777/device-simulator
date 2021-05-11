@@ -15,13 +15,13 @@ namespace DeviceSimulator
 		{
 			this.hub = hub;
 		}
-		public async IAsyncEnumerable<T> SubscribeAsync<T>(string topic, CancellationToken cancelToken)
+		public async IAsyncEnumerable<TopicMessage<T>> SubscribeAsync<T>(string topic, CancellationToken cancelToken)
 		{
-			var channel = Channel.CreateUnbounded<T>();
+			var channel = Channel.CreateUnbounded<TopicMessage<T>>();
 			Action<TopicMessage<T>> handler = async (message) =>
 			{
-				var messageTopic = message.Topic.Split('/');
-				var targetTopic = topic.Split('/');
+				var messageTopic = string.IsNullOrEmpty(message.Topic) ? new string[] { } : message.Topic.Split('/');
+				var targetTopic = string.IsNullOrEmpty(topic) ? new string[] { } : topic.Split('/');
 				if (targetTopic.Length > messageTopic.Length)
 				{
 					return;
@@ -34,8 +34,9 @@ namespace DeviceSimulator
 						return;
 					}
 				}
-				await channel.Writer.WriteAsync(message.Message);
+				await channel.Writer.WriteAsync(message);
 			};
+			Console.WriteLine("subscribing");
 			this.hub.Subscribe<TopicMessage<T>>(handler);
 			await foreach (var data in channel.Reader.ReadAllAsync(cancelToken))
 			{

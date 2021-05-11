@@ -12,6 +12,6 @@ namespace DeviceSimulator
 		public Task CreateDeviceAsync(string deviceId);
 		public Task RequestSendMessageAsync(string deviceId, string message);
 
-		public IAsyncEnumerable<T> Subscribe<T>(string topic);
+		public IAsyncEnumerable<TopicMessage<T>> Subscribe<T>(string topic);
 	}
 }
