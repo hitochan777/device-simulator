@@ -1,11 +1,9 @@
 namespace DeviceSimulator
 {
 	using System;
-	using System.Collections.Generic;
 	using System.Threading;
 	using System.Threading.Tasks;
 	using System.Text;
-
 	using Microsoft.Azure.Devices.Client;
 	public class IotHubDevice : IDevice
 	{
@@ -13,12 +11,16 @@ namespace DeviceSimulator
 		private DeviceClient deviceClient { get; set; }
 		private Task receiverTask { get; set; }
 		private CancellationTokenSource cancellationTokenSource { get; set; }
+		private ITopicEventPublisher eventPublisher { get; set; }
 
-		public IotHubDevice(string deviceId, DeviceClient deviceClient)
+
+		public IotHubDevice(string deviceId, DeviceClient deviceClient, ITopicEventPublisher eventPublisher)
 		{
 			this.deviceId = deviceId;
 			this.deviceClient = deviceClient;
+			this.eventPublisher = eventPublisher;
 		}
+
 
 		public Task StartAsync(CancellationToken token)
 		{
@@ -65,8 +67,10 @@ namespace DeviceSimulator
 				}
 				// await this.deviceClient.CompleteAsync(message, token);
 				await this.deviceClient.CompleteAsync(message);
-				var text = Encoding.UTF8.GetString(message.GetBytes());
+				var bytes = message.GetBytes();
+				var text = Encoding.UTF8.GetString(bytes);
 				Console.WriteLine($"\n[{this.deviceId}] Received message: {text}");
+				await this.eventPublisher.PublishAsync($"{deviceId}/receive-c2d", bytes);
 			}
 			Console.WriteLine($"[{this.deviceId}] stopping receiver");
 		}

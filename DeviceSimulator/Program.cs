@@ -2,6 +2,10 @@ namespace DeviceSimulator
 {
 	using System;
 	using System.Threading.Tasks;
+	using System.Text;
+
+	using PubSub;
+
 	class Program
 	{
 		private static readonly string CONNECTION_STRING = Environment.GetEnvironmentVariable("IOTHUB_CONNECTION_STRING");
@@ -9,7 +13,19 @@ namespace DeviceSimulator
 		{
 			var deviceFactory = new IotHubDeviceFactory(CONNECTION_STRING);
 			var deviceRegistrar = new IotHubDeviceRegistrar(CONNECTION_STRING);
-			await using var deviceManager = new OnmemoryDeviceManager(deviceFactory, deviceRegistrar);
+			var hub = new Hub();
+			var eventPublisher = new OnmemoryEventPublisher(hub);
+			var eventSubscriber = new OnmemoryEventSubscriber(hub);
+
+			await using var deviceManager = new OnmemoryDeviceManager(deviceFactory, deviceRegistrar, eventPublisher, eventSubscriber);
+			_ = Task.Run(async () =>
+			{
+				await foreach (var message in deviceManager.Subscribe<byte[]>(""))
+				{
+					var text = Encoding.UTF8.GetString(message.Message);
+					Console.WriteLine($"[{message.Topic}] {text}");
+				}
+			});
 			while (true)
 			{
 				Console.Write("> ");

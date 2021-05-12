@@ -5,11 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DeviceSimulator" Version="0.1.0" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="11.2.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\DeviceSimulator\DeviceSimulator.csproj" />
-  </ItemGroup>
+  <!-- <ItemGroup> -->
+  <!--   <ProjectReference Include="..\DeviceSimulator\DeviceSimulator.csproj" /> -->
+  <!-- </ItemGroup>\ -->
 
 </Project>
