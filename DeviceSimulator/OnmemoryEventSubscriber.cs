@@ -1,8 +1,8 @@
 namespace DeviceSimulator
 {
 	using System;
+	using System.Runtime.CompilerServices;
 	using System.Collections.Generic;
-	using System.Threading.Tasks;
 	using System.Threading;
 	using System.Threading.Channels;
 
@@ -15,7 +15,7 @@ namespace DeviceSimulator
 		{
 			this.hub = hub;
 		}
-		public async IAsyncEnumerable<TopicMessage<T>> SubscribeAsync<T>(string topic, CancellationToken cancelToken)
+		public async IAsyncEnumerable<TopicMessage<T>> SubscribeAsync<T>(string topic, [EnumeratorCancellation] CancellationToken cancelToken)
 		{
 			var channel = Channel.CreateUnbounded<TopicMessage<T>>();
 			Action<TopicMessage<T>> handler = async (message) =>

@@ -6,7 +6,6 @@ namespace DeviceSimulator
 	using System.Threading;
 	using System.Threading.Tasks;
 	using System.Collections.Concurrent;
-	using PubSub;
 
 	public class TopicValue<T>
 	{
@@ -92,7 +91,7 @@ namespace DeviceSimulator
 
 		public IAsyncEnumerable<TopicMessage<T>> Subscribe<T>(string topic)
 		{
-			return this.eventSubscriber.SubscribeAsync<T>(topic, this.cancellationTokenSource.Token);
+			return this.eventSubscriber.SubscribeAsync<T>(topic);
 		}
 
 		public async ValueTask DisposeAsync()
