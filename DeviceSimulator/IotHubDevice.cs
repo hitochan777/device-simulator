@@ -58,20 +58,29 @@ namespace DeviceSimulator
 			Console.WriteLine($"[{this.deviceId}] waiting for message...");
 			while (!token.IsCancellationRequested)
 			{
-				// https://github.com/Azure/azure-iot-sdk-csharp/issues/1921
-				// var message = await this.deviceClient.ReceiveAsync(token);
-				var message = await this.deviceClient.ReceiveAsync(TimeSpan.FromMilliseconds(1000));
-				if (message == null)
+				try
 				{
-					continue;
+					// https://github.com/Azure/azure-iot-sdk-csharp/issues/1921
+					// var message = await this.deviceClient.ReceiveAsync(token);
+					var message = await this.deviceClient.ReceiveAsync(TimeSpan.FromMilliseconds(1000));
+					if (message == null)
+					{
+						continue;
+					}
+					// await this.deviceClient.CompleteAsync(message, token);
+					await this.deviceClient.CompleteAsync(message);
+					var bytes = message.GetBytes();
+					var text = Encoding.UTF8.GetString(bytes);
+					Console.WriteLine($"\n[{this.deviceId}] Received message: {text}");
+					await this.eventPublisher.PublishAsync($"{deviceId}/receive-c2d", bytes);
 				}
-				// await this.deviceClient.CompleteAsync(message, token);
-				await this.deviceClient.CompleteAsync(message);
-				var bytes = message.GetBytes();
-				var text = Encoding.UTF8.GetString(bytes);
-				Console.WriteLine($"\n[{this.deviceId}] Received message: {text}");
-				await this.eventPublisher.PublishAsync($"{deviceId}/receive-c2d", bytes);
+				catch (Exception e)
+				{
+					Console.WriteLine(e);
+					break;
+				}
 			}
+			await this.eventPublisher.PublishAsync("stop-receiver", deviceId);
 			Console.WriteLine($"[{this.deviceId}] stopping receiver");
 		}
 

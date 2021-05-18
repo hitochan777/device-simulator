@@ -31,6 +31,16 @@ namespace DeviceSimulator
 			this.deviceRegistrar = deviceRegistrar;
 			this.eventPublisher = eventPublisher;
 			this.eventSubscriber = eventSubscriber;
+			_ = this.WatchDevices();
+		}
+
+		public async Task WatchDevices()
+		{
+			await foreach (var ev in this.eventSubscriber.SubscribeAsync<string>("stop-receiver").WithCancellation(this.cancellationTokenSource.Token))
+			{
+				var deviceId = ev.Message;
+				this.devices.Remove(deviceId, out _);
+			}
 		}
 
 		public async Task StartDeviceAsync(string deviceId)
@@ -55,7 +65,6 @@ namespace DeviceSimulator
 				throw new InvalidOperationException($"{deviceId} is not started yet");
 			}
 			await devices[deviceId].StopAsync();
-			this.devices.Remove(deviceId, out _);
 		}
 
 		public async Task CreateDeviceAsync(string deviceId)
