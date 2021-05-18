@@ -37,10 +37,6 @@ namespace DeviceSimulator
 			{
 				return null;
 			}
-			if (device.ConnectionState == DeviceConnectionState.Connected)
-			{
-				throw new InvalidOperationException($"{deviceId} is in connected state. You need to disconnect the device to create an instance for this device.");
-			}
 			var key = device.Authentication.SymmetricKey.PrimaryKey;
 			var connectionString = this.BuildConnectionString(deviceId, key);
 			var deviceClient = DeviceClient.CreateFromConnectionString(connectionString);
