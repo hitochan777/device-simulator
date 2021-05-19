@@ -84,18 +84,27 @@ namespace DeviceSimulator
 			await device.SendMessageAsync(message);
 		}
 
-		public async Task<IList<string>> ListDevices(bool onlyRunning = true)
+		public async Task<IList<DeviceStatus>> GetDeviceStatusesAsync()
 		{
-			if (onlyRunning)
-			{
-				return this.devices.Keys.ToList();
-			}
-			var ids = new List<string>();
+			var ids = new List<DeviceStatus>();
 			await foreach (var deviceId in this.deviceRegistrar.FetchDevices())
 			{
-				ids.Add(deviceId);
+				ids.Add(new DeviceStatus
+				{
+					Id = deviceId,
+					IsRunning = this.devices.ContainsKey(deviceId)
+				});
 			}
 			return ids;
+		}
+
+		public async Task<DeviceStatus> GetDeviceStatusAsync(string deviceId)
+		{
+			return await Task.FromResult(new DeviceStatus
+			{
+				Id = deviceId,
+				IsRunning = this.devices.ContainsKey(deviceId)
+			});
 		}
 
 		public IAsyncEnumerable<TopicMessage<T>> Subscribe<T>(string topic)

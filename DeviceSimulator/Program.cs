@@ -86,11 +86,18 @@ namespace DeviceSimulator
 						}
 					case "list":
 						{
-							var ids = await deviceManager.ListDevices(onlyRunning: true);
-							foreach (var id in ids)
+							var statuses = await deviceManager.GetDeviceStatusesAsync();
+							foreach (var status in statuses)
 							{
-								Console.WriteLine(id);
+								Console.WriteLine($"{status.Id}: {status.IsRunning}");
 							}
+							break;
+						}
+					case "show":
+						{
+							var deviceId = tokens[1];
+							var status = await deviceManager.GetDeviceStatusAsync(deviceId);
+							Console.WriteLine($"{status.Id}: {status.IsRunning}");
 							break;
 						}
 					case "quit":
