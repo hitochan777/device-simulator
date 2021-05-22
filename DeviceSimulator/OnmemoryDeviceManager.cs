@@ -73,7 +73,7 @@ namespace DeviceSimulator
 			await Task.CompletedTask;
 		}
 
-		public async Task RequestSendMessageAsync(string deviceId, string message)
+		public async Task RequestSendMessageAsync(string deviceId, byte[] message)
 		{
 			IDevice device;
 			var ok = this.devices.TryGetValue(deviceId, out device);

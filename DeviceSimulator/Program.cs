@@ -76,7 +76,7 @@ namespace DeviceSimulator
 							var message = tokens[2];
 							try
 							{
-								await deviceManager.RequestSendMessageAsync(deviceId, message);
+								await deviceManager.RequestSendMessageAsync(deviceId, Encoding.ASCII.GetBytes(message));
 							}
 							catch (DeviceNotFoundException ex)
 							{

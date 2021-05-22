@@ -8,6 +8,6 @@ namespace DeviceSimulator
 		Task StartAsync(CancellationToken token);
 
 		Task StopAsync();
-		Task SendMessageAsync(string message);
+		Task SendMessageAsync(byte[] message);
 	}
 }
