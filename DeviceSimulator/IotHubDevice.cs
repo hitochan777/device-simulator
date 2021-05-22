@@ -33,9 +33,9 @@ namespace DeviceSimulator
 			return this.receiverTask;
 		}
 
-		public async Task SendMessageAsync(string message)
+		public async Task SendMessageAsync(byte[] message)
 		{
-			await this.deviceClient.SendEventAsync(new Message(Encoding.UTF8.GetBytes(message)));
+			await this.deviceClient.SendEventAsync(new Message(message));
 			Console.WriteLine($"Sent message {message}");
 		}
 
@@ -70,8 +70,7 @@ namespace DeviceSimulator
 					// await this.deviceClient.CompleteAsync(message, token);
 					await this.deviceClient.CompleteAsync(message);
 					var bytes = message.GetBytes();
-					var text = Encoding.UTF8.GetString(bytes);
-					Console.WriteLine($"\n[{this.deviceId}] Received message: {text}");
+					Console.WriteLine($"\n[{this.deviceId}] Received message: {BitConverter.ToString(bytes)}");
 					await this.eventPublisher.PublishAsync($"{deviceId}/receive-c2d", bytes);
 				}
 				catch (Exception e)
