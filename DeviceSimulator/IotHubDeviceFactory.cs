@@ -5,6 +5,7 @@ namespace DeviceSimulator
 	using System.Threading.Tasks;
 	using Microsoft.Azure.Devices;
 	using Microsoft.Azure.Devices.Client;
+	using Azure.Core;
 
 	public class IotHubDeviceFactory : IDeviceFactory
 	{
@@ -23,6 +24,12 @@ namespace DeviceSimulator
 			{
 				throw new ArgumentException("Host name could not be extracted from connection string.");
 			}
+		}
+
+		public IotHubDeviceFactory(string hostName, TokenCredential credential)
+		{
+			this.registryManager = RegistryManager.Create(hostName, credential);
+			this.hostName = hostName;
 		}
 
 		private string BuildConnectionString(string deviceId, string key)

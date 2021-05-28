@@ -1,6 +1,5 @@
 namespace DeviceSimulator
 {
-	using System;
 	using System.Threading.Tasks;
 
 	using PubSub;

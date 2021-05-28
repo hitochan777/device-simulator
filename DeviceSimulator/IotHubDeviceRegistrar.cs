@@ -2,6 +2,7 @@ namespace DeviceSimulator
 {
 	using System.Collections.Generic;
 	using Microsoft.Azure.Devices;
+	using Azure.Core;
 
 	public class IotHubDeviceRegistrar : IDeviceRegistrar
 	{
@@ -10,6 +11,11 @@ namespace DeviceSimulator
 		{
 			this.registryManager = RegistryManager.CreateFromConnectionString(connectionString);
 		}
+		public IotHubDeviceRegistrar(string hostName, TokenCredential credential)
+		{
+			this.registryManager = RegistryManager.Create(hostName, credential);
+		}
+
 		public async IAsyncEnumerable<string> FetchDevices()
 		{
 			var query = this.registryManager.CreateQuery("select * from devices", pageSize: 100);
