@@ -4,7 +4,7 @@
 		<PackageId>DeviceSimulator</PackageId>
 		<Version>0.7.0</Version>
 		<Authors>Hitoshi Otsuki</Authors>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
