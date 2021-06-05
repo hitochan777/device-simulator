@@ -1,5 +1,6 @@
 namespace DeviceSimulator
 {
+	using System.Threading.Tasks;
 	using System.Collections.Generic;
 	using Microsoft.Azure.Devices;
 	using Azure.Core;
@@ -16,7 +17,7 @@ namespace DeviceSimulator
 			this.registryManager = RegistryManager.Create(hostName, credential);
 		}
 
-		public async IAsyncEnumerable<string> FetchDevices()
+		public async IAsyncEnumerable<string> FetchDevicesAsync()
 		{
 			var query = this.registryManager.CreateQuery("select * from devices", pageSize: 100);
 			while (query.HasMoreResults)
@@ -28,5 +29,16 @@ namespace DeviceSimulator
 				}
 			}
 		}
+
+		public async Task<string> FetchDeviceAsync(string deviceId)
+		{
+			var device = await this.registryManager.GetDeviceAsync(deviceId);
+			if (device == null)
+			{
+				return null;
+			}
+			return device.Id;
+		}
+
 	}
 }

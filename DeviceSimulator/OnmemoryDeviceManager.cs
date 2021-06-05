@@ -87,7 +87,7 @@ namespace DeviceSimulator
 		public async Task<IList<DeviceStatus>> GetDeviceStatusesAsync()
 		{
 			var ids = new List<DeviceStatus>();
-			await foreach (var deviceId in this.deviceRegistrar.FetchDevices())
+			await foreach (var deviceId in this.deviceRegistrar.FetchDevicesAsync())
 			{
 				ids.Add(new DeviceStatus
 				{
@@ -100,6 +100,11 @@ namespace DeviceSimulator
 
 		public async Task<DeviceStatus> GetDeviceStatusAsync(string deviceId)
 		{
+			var device = await this.deviceRegistrar.FetchDeviceAsync(deviceId);
+			if (device == null)
+			{
+				throw new ArgumentException($"{deviceId} is not found in device registrar");
+			}
 			return await Task.FromResult(new DeviceStatus
 			{
 				Id = deviceId,
