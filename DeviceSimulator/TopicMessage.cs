@@ -4,6 +4,6 @@ namespace DeviceSimulator
 	{
 
 		public string Topic { get; set; }
-	public T Message { get; set; }
-}
+		public T Message { get; set; }
+	}
 }

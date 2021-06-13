@@ -5,6 +5,6 @@ namespace DeviceSimulator
 
 		public string Id { get; set; }
 
-	public bool IsRunning { get; set; }
-}
+		public bool IsRunning { get; set; }
+	}
 }
