@@ -36,7 +36,6 @@ namespace DeviceSimulator
 				}
 				await channel.Writer.WriteAsync(message);
 			};
-			Console.WriteLine("subscribing");
 			this.hub.Subscribe<TopicMessage<T>>(handler);
 			await foreach (var data in channel.Reader.ReadAllAsync(cancelToken))
 			{
