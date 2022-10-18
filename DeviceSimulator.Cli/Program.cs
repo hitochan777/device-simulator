@@ -45,6 +45,22 @@ while (true)
         try
         {
           await deviceManager.StartDeviceAsync(deviceId);
+          deviceManager.AddReceiveMessageEventHandler(deviceId, (object sender, byte[] message) =>
+          {
+            var device = (IDevice)sender;
+            Task.Run(async () => {
+              await device.SendMessageAsync(new byte[] { 0x01 });
+              Console.WriteLine("Sent message in event handler");
+            });
+          });
+          deviceManager.RegisterJob(deviceId, (device) => async (token) =>
+          {
+            while (true)
+            {
+              await device.SendMessageAsync(new byte[] { 0x02 });
+              await Task.Delay(10000);
+            }
+          });
         }
         catch (DeviceNotFoundException ex)
         {
