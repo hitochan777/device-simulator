@@ -36,7 +36,6 @@ namespace DeviceSimulator
         public async Task SendMessageAsync(byte[] message)
         {
             await this.deviceClient.SendEventAsync(new Message(message));
-            Console.WriteLine($"Sent message {message}");
         }
 
         public async Task StopAsync()
@@ -55,7 +54,6 @@ namespace DeviceSimulator
 
         private async Task StartReceiverAsync(CancellationToken token)
         {
-            Console.WriteLine($"[{this.deviceId}] waiting for message...");
             while (!token.IsCancellationRequested)
             {
                 try
@@ -70,7 +68,6 @@ namespace DeviceSimulator
                     // await this.deviceClient.CompleteAsync(message, token);
                     await this.deviceClient.CompleteAsync(message);
                     var bytes = message.GetBytes();
-                    Console.WriteLine($"\n[{this.deviceId}] Received message: {BitConverter.ToString(bytes)}");
                     await this.eventPublisher.PublishAsync($"{deviceId}/receive-c2d", bytes);
 
                     EventHandler<byte[]> handler = MessageReceived;
@@ -87,7 +84,6 @@ namespace DeviceSimulator
                 }
             }
             await this.eventPublisher.PublishAsync("stop-receiver", deviceId);
-            Console.WriteLine($"[{this.deviceId}] stopping receiver");
         }
         public void RegisterJob(Func<IDevice, Func<CancellationToken, Task>> jobCreator)
         {
