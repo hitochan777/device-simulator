@@ -77,10 +77,26 @@ namespace DeviceSimulator
                     }
 
                 }
+                catch (OperationCanceledException)
+                {
+                    // Token was cancelled, exit the loop
+                    Console.WriteLine($"[{deviceId}] Receiver cancelled, stopping");
+                    break;
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Device client was disposed, exit the loop
+                    Console.WriteLine($"[{deviceId}] Device client disposed, stopping receiver");
+                    break;
+                }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
-                    break;
+                    // Log the error and continue receiving
+                    Console.WriteLine($"[{deviceId}] Error in receiver (will retry): {e.GetType().Name} - {e.Message}");
+
+                    // Add delay to avoid tight loop on persistent errors
+                    await Task.Delay(TimeSpan.FromSeconds(5), token);
+                    continue;
                 }
             }
             await this.eventPublisher.PublishAsync("stop-receiver", deviceId);
